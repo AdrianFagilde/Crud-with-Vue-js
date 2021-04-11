@@ -21,6 +21,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/User-Login.vue')
   },
   {
+    path: '/registro',
+    name: 'Registro',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Registro.vue')
+  },
+  {
     path: '/home',
     name: 'Home',
     component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
@@ -49,22 +54,24 @@ const router = new VueRouter({
 
 
  router.beforeEach((to, from, next) => {
+  
+
+
   let correo = firebase.auth().currentUser;  
   console.log(correo)
   let autorizacion = to.matched.some(record => record.meta.permiso);
   if(autorizacion && !correo) {
-    firebase.auth().onAuthStateChanged;
+    
 
     next('User-Login')
   } else if (!autorizacion && correo){
-    firebase.auth().onAuthStateChanged;
-
     next('Lista-Tareas')
   }else{
-    firebase.auth().onAuthStateChanged;
+    
 
     next()
   }
+  
 }) 
 
 export default router

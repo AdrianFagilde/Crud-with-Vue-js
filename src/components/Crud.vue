@@ -73,6 +73,8 @@
 
 <script>
 import {db} from '../main.js';
+import {mapMutations} from  'vuex';
+
 
 	export default{ 
 		name: 'Crud', 
@@ -90,14 +92,19 @@ import {db} from '../main.js';
 			} 
 		},
     created(){
-      
+
       this.getTareas();
 
     },
     methods:{
-      async getTareas(){
-        try{
 
+      ...mapMutations(['mostrarBotones']),
+
+      async getTareas(){
+        
+        try{
+          
+          this.mostrarBotones({cerrarSesion:true,iniciar:false,registrar:false})
           this.mostrar = true
           const snapshot = await db.collection('tareas').get()
           const tareas = []
@@ -178,5 +185,9 @@ import {db} from '../main.js';
 
       		}
     }
+
+   
 }
+
+
 </script>

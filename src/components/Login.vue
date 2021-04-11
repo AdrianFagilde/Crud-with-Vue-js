@@ -21,27 +21,45 @@
 
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase';
+import {mapMutations} from 'vuex';
+
+
+
 	export default {
 		name: 'Login',
 		data(){
 			return{
 				correo: '',
-				contraseña: ''
+		        contraseña: ''
 			}
 			
 
 		},
+
+		created(){
+			this.ver()
+		},
+
+
 		methods: {
+			...mapMutations(['mostrarBotones']),
+
+			ver(){
+				this.mostrarBotones({cerrarSesion:false,iniciar:false,registrar:true})
+			},
+			
 			login() {
 				firebase
 				.auth()
 				.signInWithEmailAndPassword(this.correo, this.contraseña)
-  				.then((user) => alert('Usuario activo'), (error) => console.error(error));
-  				
-
+  				.then((user) => this.$router.replace('Lista-Tareas'), (error) => console.error(error));
 			}
-		}
+		},
+
+		
+		
+		
 	}
 </script>
 
