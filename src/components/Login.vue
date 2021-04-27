@@ -7,9 +7,24 @@
 					<v-card-title >
 						Login
 					</v-card-title>
-					<v-form @submit.prevent="login">
-						<v-text-field dark label="Correo" v-model="correo"></v-text-field>
-						<v-text-field dark label="Contraseña" v-model="contraseña"></v-text-field>
+					<v-form ref="form"
+                       v-model="valid"
+                       lazy-validation
+					   @submit.prevent="login">
+
+						<v-text-field dark 
+						    label="Correo" 
+						    v-model="correo"
+						    :rules="correoRules"
+						    required
+						></v-text-field>
+						<v-text-field dark 
+						    label="Contraseña" 
+						    v-model="contraseña"
+						    :counter="10"
+						    :rules="contraseñaRules"
+						    required
+						    ></v-text-field>
 						<v-btn class="error" block type="submit">acceder</v-btn>
 					</v-form>
 				</v-card>
@@ -26,12 +41,25 @@ import {mapMutations} from 'vuex';
 
 
 
+
 	export default {
 		name: 'Login',
 		data(){
 			return{
+				valid: true,
 				correo: '',
-		        contraseña: ''
+		        contraseña: '',
+		        correoRules: [
+				    v => !!v || 'correo es requerido',
+				    v => /.+@.+\..+/.test(v) || 'El correo es valido'
+				],
+				contraseñaRules: [
+				    v => !!v || 'contraseña requerida',
+                    v => (v && v.length <= 10) || 'contraseña valida',
+
+				]
+
+
 			}
 			
 
@@ -43,19 +71,30 @@ import {mapMutations} from 'vuex';
 
 
 		methods: {
-			...mapMutations(['mostrarBotones']),
+			...mapMutations(['mostrarBotones','ocultarDrawer']),
+			
 
 			ver(){
 				this.mostrarBotones({cerrarSesion:false,iniciar:false,registrar:true})
+                this.ocultarDrawer()
 			},
+
+			validate () {
+              this.$refs.form.validate()
+            },
 			
 			login() {
+
+				this.validate()
+
 				firebase
 				.auth()
 				.signInWithEmailAndPassword(this.correo, this.contraseña)
   				.then((user) => this.$router.replace('Lista-Tareas'), (error) => console.error(error));
 			}
 		},
+
+
 
 		
 		

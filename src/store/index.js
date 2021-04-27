@@ -9,7 +9,8 @@ export default new Vuex.Store({
   
   		cerrarSesion: false,
   		iniciar: false,
-  		registrar: false
+  		registrar: false,
+      ver: false
 
   		
   },
@@ -18,10 +19,13 @@ export default new Vuex.Store({
   		state.cerrarSesion = cs.cerrarSesion;
   		state.iniciar = cs.iniciar;
   		state.registrar = cs.registrar;
-
-
-
-  	}
+  	},
+    mostrarDrawer(state){
+      state.ver = true;
+    },
+    ocultarDrawer(state){
+      state.ver = false;
+    }
   },
   actions: {
   },

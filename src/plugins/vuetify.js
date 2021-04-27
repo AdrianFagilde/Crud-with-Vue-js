@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib/framework';
 
-
 Vue.use(Vuetify);
 
 export default new Vuetify({
@@ -12,10 +11,10 @@ export default new Vuetify({
     themes: {
       light: {
         primary: '#1E2A78',
-        secondary: '#FFE720',
-        accent: '#49DEB2',
+        secondary: '#424242',
+        accent: '#82B1FF',
         error: '#FF2E4C',
-        info: '#49BCF6',
+        info: '#2196F3',
         success: '#4CAF50',
         warning: '#FFC107'
       },

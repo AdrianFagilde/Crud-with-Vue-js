@@ -6,7 +6,7 @@
       dense
       app 
     >
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon  v-if="ver" @click="drawer = !drawer"></v-app-bar-nav-icon>
     	
       		<v-toolbar-title>Crud</v-toolbar-title>
       		<v-spacer></v-spacer>
@@ -64,12 +64,13 @@ import {mapState} from 'vuex';
 		data() {
 			return{
 				drawer: false
-
 			}
 		},
 	
 
     methods:{
+
+      
 
       logout() {
         firebase.auth().signOut().then(() => this.$router.replace('User-Login'));
@@ -79,7 +80,7 @@ import {mapState} from 'vuex';
     },
 
     computed:{
-    	...mapState(['cerrarSesion','iniciar','registrar'])
+    	...mapState(['cerrarSesion','iniciar','registrar','ver'])
     }
 
 	}

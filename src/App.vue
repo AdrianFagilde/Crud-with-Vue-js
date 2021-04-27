@@ -1,26 +1,22 @@
 <template>
   <v-app>
-    
-    <Menus>
-    </Menus>
-    
+   
+      <Menu></Menu>
+
     <v-main>
       <router-view/>
     </v-main>
-
-
-
   </v-app>
 </template>
 
 <script>
-import Menus from './components/Menus.vue'
+import Menu from './components/Menus.vue';
 
 export default {
   name: 'App',
 
   components: {
-    Menus
+    Menu,
   },
 
   data: () => ({
@@ -28,6 +24,3 @@ export default {
   }),
 };
 </script>
-
-
-

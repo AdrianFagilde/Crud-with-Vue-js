@@ -1,71 +1,63 @@
 <template>
-	<v-container grid-list-md>
-		<v-layout row wrap>
-			<v-flex md6>
-       <div class="text-center">
-         <v-progress-circular
-            
-            v-if="mostrar"
-            indeterminate
-            color="error"
-         >
-           
-         </v-progress-circular>
-       </div>
-         
-        
-				<v-card class="mb-2" v-for="(item, index) in tareas" :key="index" >
-					<v-card-text >
-						<v-chip label color="primary" text-color="white" class="mb-2">
-							<v-icon left>mdi-tag</v-icon>
-
-							{{item.titulo}}
-						</v-chip>
-
-						<p class="black--text">{{item.descripcion}}</p>
-						<v-btn color="info" @click="editar(index, item.id)">Editar</v-btn>
-						<v-btn color="error" @click="eliminar(item.id)">eliminar</v-btn>
-					</v-card-text>
-				</v-card>
-
-
-			</v-flex>
-			<v-flex md6>
-				<v-card class="mb-2 pa-3" v-if="estado">
-					<v-form @submit.prevent="agregarTareas">
-						<v-text-field  label="Titulo de Tarea" v-model="newTitulo"></v-text-field>
-						<v-textarea  label="Descripcion" v-model="newDescripcion"></v-textarea>
-						<v-btn class="success" block type="submit">agregar tarea</v-btn>
-					</v-form>	
-				</v-card>
-
-				<v-card class="mb-2 pa-3" v-if="!estado">
-					<v-form @submit.prevent="guardar(index)">
-						<v-text-field  label="Titulo de Tarea" v-model="newTitulo"></v-text-field>
-						<v-textarea  label="Descripcion" v-model="newDescripcion"></v-textarea>
-						<v-btn class="warning" block type="submit">Guardar</v-btn>
-					</v-form>	
-				</v-card>
-			</v-flex>
-		</v-layout>
-
-		<v-snackbar
-      		v-model="snackbar"
-    	>
-      		{{ mensaje }}
-
-      	<template v-slot:action="{ attrs }">
-        <v-btn
-          color="pink"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-	</v-container>
+    <v-container grid-list-md>
+        <v-layout row wrap>
+            <v-flex md6>
+                <v-btn class="success" @click="crearTarea" block>crear nueva tarea</v-btn>
+                <v-dialog v-model="dialog" max-width="600px">
+                    <v-card class="mb-2 pa-3" v-if="estado">
+                        <v-form @submit.prevent="agregarTareas">
+                            <v-text-field label="Titulo de Tarea" v-model="newTitulo"></v-text-field>
+                            <v-textarea label="Descripcion" v-model="newDescripcion"></v-textarea>
+                            <v-btn class="success" block type="submit">agregar tarea</v-btn>
+                        </v-form>
+                    </v-card>
+                    <v-card class="mb-2 pa-3" v-if="!estado">
+                        <v-form @submit.prevent="guardar(index)">
+                            <v-text-field label="Titulo de Tarea" v-model="newTitulo"></v-text-field>
+                            <v-textarea label="Descripcion" v-model="newDescripcion"></v-textarea>
+                            <v-btn class="warning" block type="submit">Guardar</v-btn>
+                        </v-form>
+                    </v-card>
+                </v-dialog>
+            </v-flex>
+            <v-flex md6>
+                <div class="text-center">
+                    <v-progress-circular v-if="mostrar" indeterminate color="error">
+                    </v-progress-circular>
+                </div>
+                <v-card class="mb-2" v-for="(item, index) in tareas" :key="index">
+                    <v-card-text>
+                        <v-chip label color="primary" text-color="white" class="mb-2">
+                            <v-icon left>mdi-tag</v-icon>
+                            {{item.titulo}}
+                        </v-chip>
+                        <p class="black--text">{{item.descripcion}}</p>
+                        <v-btn color="info" @click="editar(index, item.id)">Editar</v-btn>
+                        <v-btn color="error" @click="preguntarEliminar(item.id)">eliminar</v-btn>
+                    </v-card-text>
+                </v-card>
+            </v-flex>
+        </v-layout>
+        <v-snackbar v-model="snackbar2">
+            {{ mensaje }}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="pink" text v-bind="attrs" @click="eliminar()">
+                    si
+                </v-btn>
+                <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
+        <v-snackbar v-model="snackbar">
+            {{ mensaje }}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
+    </v-container>
 </template>
 
 
@@ -76,6 +68,7 @@ import {db} from '../main.js';
 import {mapMutations} from  'vuex';
 
 
+
 	export default{ 
 		name: 'Crud', 
 		data() { 
@@ -83,10 +76,13 @@ import {mapMutations} from  'vuex';
 				newTitulo: '' ,
 				newDescripcion: '',
 				snackbar: false,
+        snackbar2: false,
 				mensaje: '',
 				estado: true,
 				indexTarea: null,
-        mostrar: false
+        mostrar: false,
+        dialog: false,
+        id:null
 
         
 			} 
@@ -98,13 +94,14 @@ import {mapMutations} from  'vuex';
     },
     methods:{
 
-      ...mapMutations(['mostrarBotones']),
+      ...mapMutations(['mostrarBotones','mostrarDrawer']),
 
       async getTareas(){
         
         try{
           
           this.mostrarBotones({cerrarSesion:true,iniciar:false,registrar:false})
+          this.mostrarDrawer()
           this.mostrar = true
           const snapshot = await db.collection('tareas').get()
           const tareas = []
@@ -146,14 +143,16 @@ import {mapMutations} from  'vuex';
         			this.newTitulo = ''
         			this.snackbar = true
         			this.mensaje = 'La Tarea se agregado exitosamente'
+              this.dialog = false
               this.getTareas()
         		}
       		},
-      		async eliminar(id){
+      		async eliminar(){
 
             try{
 
-              await db.collection('tareas').doc(id).delete()
+              await db.collection('tareas').doc(this.id).delete()
+              this.snackbar2 = false
               this.getTareas()
 
             }catch(error){
@@ -164,6 +163,7 @@ import {mapMutations} from  'vuex';
       			
       		},
       		async editar(index, item){
+            this.dialog = true
       			this.estado = false
       			this.newTitulo = this.tareas[index].titulo
       			this.newDescripcion = this.tareas[index].descripcion
@@ -175,7 +175,8 @@ import {mapMutations} from  'vuex';
               titulo: this.newTitulo,
               descripcion: this.newDescripcion
             })
-      			this.estado = true
+            this.dialog = false
+      			
       			this.newTitulo = ''
       			this.newDescripcion = ''
       			this.snackbar = true
@@ -183,7 +184,17 @@ import {mapMutations} from  'vuex';
 
             this.getTareas()
 
-      		}
+      		},
+          crearTarea(){
+            this.dialog = true 
+            this.estado = true
+          },
+          preguntarEliminar(index){
+            this.snackbar2 = true
+            this.mensaje = 'Seguro que desea eliminar la tarea'
+            this.id = index
+
+          }
     }
 
    

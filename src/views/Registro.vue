@@ -7,9 +7,23 @@
 					<v-card-title >
 						Registro
 					</v-card-title>
-					<v-form @submit.prevent="registrar()">
-						<v-text-field dark label="new Correo" v-model="newCorreo"></v-text-field>
-						<v-text-field dark label="new Contraseña" v-model="newContraseña"></v-text-field>
+					<v-form ref="form"
+                       v-model="valid"
+                       lazy-validation
+                       @submit.prevent="registrar()">
+
+						<v-text-field dark label="Correo" 
+						  v-model="newCorreo"
+						  :rules="correoRules"
+						  required
+						></v-text-field>
+						<v-text-field dark 
+						   label="Contraseña" 
+						   v-model="newContraseña"
+						   :counter="10"
+						   :rules="contraseñaRules"
+						   required
+						></v-text-field>
 						<v-btn class="error" block type="submit">registrar</v-btn>
 					</v-form>
 				</v-card>
@@ -29,8 +43,18 @@ import {mapMutations} from 'vuex';
 
 		data(){
 			return{
+				valid: true,
 				newCorreo: '',
-				newContraseña: ''
+				newContraseña: '',
+				correoRules: [
+				    v => !!v || 'correo es requerido',
+				    v => /.+@.+\..+/.test(v) || 'El correo es valido'
+				],
+				contraseñaRules: [
+				    v => !!v || 'contraseña requerida',
+                    v => (v && v.length <= 10) || 'contraseña valida',
+
+				]
 
         
 			}
@@ -47,8 +71,14 @@ import {mapMutations} from 'vuex';
 		methods:{
 			...mapMutations(['mostrarBotones']),
 
+			validate () {
+              this.$refs.form.validate()
+            },
+
 
 			registrar(){
+
+				this.validate()
 				firebase
 				.auth()
 				.createUserWithEmailAndPassword(this.newCorreo, this.newContraseña)
